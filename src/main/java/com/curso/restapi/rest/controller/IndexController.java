@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.curso.restapi.rest.model.Usuario;
 import com.curso.restapi.rest.repository.UsuarioRepository;
 
+// @CrossOrigin(origins = "www.siteexemplo.com.br") Apenas esse servidor teria acesso a API para enviar e receber requisicoes
+@CrossOrigin // Por padrao origins eh '*' (tem acesso geral)
 @RestController
 @RequestMapping(path = "/usuarios")
 public class IndexController {
@@ -55,6 +58,9 @@ public class IndexController {
     return ResponseEntity.ok(usuario.get());
   }
 
+  // @CrossOrigin(origins = {"www.teste.com.br", "www.sistema.com.br"})
+  // configurando servidor que vai ter
+  // acesso ao endpoint especifico, pode ser varios ou apenas 1
   @GetMapping(path = "/")
   public ResponseEntity<List<Usuario>> consultaTodos() {
     List<Usuario> usuarios = usuarioRepository.findAll();
@@ -63,6 +69,11 @@ public class IndexController {
 
   @PostMapping(path = "/")
   public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
+
+    for (int pos = 0; pos < usuario.getTelefones().size(); pos++) {
+      usuario.getTelefones().get(pos).setUsuario(usuario);
+    }
+
     Usuario usuarioSalvo = usuarioRepository.save(usuario);
     return ResponseEntity.ok(usuarioSalvo);
   }
@@ -76,6 +87,9 @@ public class IndexController {
    */
   @PutMapping(path = "/")
   public ResponseEntity<Usuario> atualizar(@RequestBody Usuario usuario) {
+    for (int pos = 0; pos < usuario.getTelefones().size(); pos++) {
+      usuario.getTelefones().get(pos).setUsuario(usuario);
+    }
     Usuario usuarioSalvo = usuarioRepository.save(usuario);
     return ResponseEntity.ok(usuarioSalvo);
   }
