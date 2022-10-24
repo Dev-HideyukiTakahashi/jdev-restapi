@@ -3,7 +3,10 @@ package com.curso.restapi.rest.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -55,6 +58,8 @@ public class IndexController {
    * @return usuario pelo id
    */
   @GetMapping(path = "/{id}")
+  @CacheEvict(value = "cacheuser", allEntries = true) // remove cache que nao eh usado
+  @CachePut("cacheuser") // atualiza o cache se tiver dados novos no bd
   public ResponseEntity<Usuario> consulta(@PathVariable Long id) {
     Optional<Usuario> usuario = usuarioRepository.findById(id);
     return ResponseEntity.ok(usuario.get());
