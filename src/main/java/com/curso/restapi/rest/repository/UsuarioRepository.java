@@ -6,4 +6,5 @@ import com.curso.restapi.rest.model.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
+  Usuario findByLogin(String login);
 }

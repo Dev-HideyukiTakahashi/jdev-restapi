@@ -23,6 +23,8 @@ public class RestApplication implements WebMvcConfigurer {
 
 		registry.addMapping("/usuarios/**"); // libera acesso a todos endpoints do controller usuarios
 
+		// Criptografando a senha
+		// System.out.println(new BCryptPasswordEncoder().encode("admin"));
 	}
 
 }
