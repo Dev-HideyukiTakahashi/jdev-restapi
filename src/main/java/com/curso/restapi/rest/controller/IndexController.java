@@ -40,7 +40,7 @@ public class IndexController {
    * @param nome recebe o parametro pela requisicao web
    * @return
    */
-  @GetMapping(path = "/ola", produces = "application/json")
+  @GetMapping(path = "/ola", produces = "application/json", headers = "X-API-Version=v1")
   public ResponseEntity<Usuario> init(@RequestParam(value = "nome", required = false) String nome) {
     Usuario usuario = new Usuario();
     usuario.setNome(nome);
