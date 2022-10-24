@@ -15,6 +15,7 @@ import com.curso.restapi.rest.ApplicationContextLoad;
 import com.curso.restapi.rest.model.Usuario;
 import com.curso.restapi.rest.repository.UsuarioRepository;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -55,23 +56,32 @@ public class JWTTokenAutenticacaoService {
 
   /* retorna o usuario validado com token, ou retorna null */
   public Authentication getAuthentication(HttpServletRequest request, HttpServletResponse response) {
+
     /* pega o token enviado no cabecalho http */
     String token = request.getHeader(HEADER_STRING);
+    try {
+      if (token != null) {
+        /* faz a validacao do token do usuario na requisicao */
+        String user = Jwts.parser()
+            .setSigningKey(SECRET) // EX: Bearer fnjk383nfdf3m2m3kmkf3efsdf
+            .parseClaimsJws(token.replace(TOKEN_PREFIX, "")) // EX: fnjk383nfdf3m2m3kmkf3efsdf
+            .getBody().getSubject(); // Usuario Nome
 
-    if (token != null) {
-      /* faz a validacao do token do usuario na requisicao */
-      String user = Jwts.parser()
-          .setSigningKey(SECRET) // EX: Bearer fnjk383nfdf3m2m3kmkf3efsdf
-          .parseClaimsJws(token.replace(TOKEN_PREFIX, "")) // EX: fnjk383nfdf3m2m3kmkf3efsdf
-          .getBody().getSubject(); // Usuario Nome
-
-      if (user != null) {
-        Usuario usuario = ApplicationContextLoad.getApplicationContext().getBean(UsuarioRepository.class)
-            .findByLogin(user);
-        if (usuario != null) {
-          return new UsernamePasswordAuthenticationToken(usuario.getUsername(), usuario.getPassword(),
-              usuario.getAuthorities());
+        if (user != null) {
+          Usuario usuario = ApplicationContextLoad.getApplicationContext().getBean(UsuarioRepository.class)
+              .findByLogin(user);
+          if (usuario != null) {
+            return new UsernamePasswordAuthenticationToken(usuario.getUsername(), usuario.getPassword(),
+                usuario.getAuthorities());
+          }
         }
+      }
+    } catch (ExpiredJwtException e) {
+      try {
+        response.getOutputStream()
+            .println("Seu TOKEN está expirado, faça o login novamente, ou informe um novo token.");
+      } catch (IOException e1) {
+        e1.printStackTrace();
       }
     }
 
