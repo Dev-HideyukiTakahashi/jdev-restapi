@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -63,7 +64,10 @@ public class IndexController {
   // configurando servidor que vai ter
   // acesso ao endpoint especifico, pode ser varios ou apenas 1
   @GetMapping(path = "/")
-  public ResponseEntity<List<Usuario>> consultaTodos() {
+  @Cacheable("cacheusuarios") // Habilita o cache
+  public ResponseEntity<List<Usuario>> consultaTodos() throws InterruptedException {
+
+    Thread.sleep(6000); // simulando lentidao no sistema // carregamento de muitos usuarios de uma vez
     List<Usuario> usuarios = usuarioRepository.findAll();
     return ResponseEntity.ok(usuarios);
   }
